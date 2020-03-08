@@ -1,9 +1,11 @@
-export type Team = 'monsters' | 'humans';
+export type Team = 'monsters' | 'humans' | 'tanner';
 
 export interface Card {
     name: string;
     description: string;
     team: Team;
+    limit?: number;
+    winsWith?: Team;
 }
 
 const allCards: Card[] = [
@@ -31,6 +33,19 @@ const allCards: Card[] = [
         name: 'Troublemaker',
         description: `The troublemaker swaps two other players' cards, without looking at them.`,
         team: 'humans',
+    },
+    {
+        name: 'Minion',
+        description: `The minion is a human, but wins with the werewolfs. Werewolfs see who the minion is.`,
+        team: 'humans',
+        winsWith: 'monsters',
+        limit: 1,
+    },
+    {
+        name: 'Tanner',
+        description: `The troublemaker swaps two other players' cards, without looking at them.`,
+        team: 'tanner',
+        limit: 1,
     },
 ];
 

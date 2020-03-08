@@ -213,18 +213,18 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
 
     private finishGame() {
         const killedPlayers = this.tallyVotes();
-        const winningTeam = this.determineWinners(killedPlayers);
+        const winningTeams = this.determineWinners(killedPlayers);
         
         this.sendCommand(undefined, {
             type: 'result',
             killed: killedPlayers,
-            winner: winningTeam,
+            winners: winningTeams,
             playerCards: this.state.playerCards ?? {},
         });
 
         this.updateState({
             phase: GamePhase.Results,
-            winners: winningTeam,
+            winners: winningTeams,
             killedPlayers: killedPlayers,
         });
 
@@ -259,10 +259,8 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
         return mostVoted;
     }
 
-    private determineWinners(killedPlayers: string[]) : Team {
-        // If any one killed player is on the monster's team, the humans win.
-        // Otherwise the monsters win.
-        const anyMonsterKilled = killedPlayers.some(player => {
+    private determineWinners(killedPlayers: string[]) : Team[] {
+        const teamIs = (player: string, team: Team) => {
             const cardIndex = this.state.playerCards && this.state.playerCards[player];
             if (cardIndex === undefined) {
                 return false;
@@ -278,14 +276,23 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
                 return false;
             }
 
-            return card.team === 'monsters';
-        });
+            return card.team === team;
+        }
+        
+        const anyMonsterKilled = killedPlayers.some(player => teamIs(player, 'monsters'));
+        const tannerKilled = killedPlayers.some(player => teamIs(player, 'tanner'));
 
-        // TODO: This will need adapted to work with the tanner or the minion.
+        if (tannerKilled) {
+            if (anyMonsterKilled) {
+                return ['humans', 'tanner'];
+            }
+
+            return ['tanner'];
+        }
 
         return anyMonsterKilled
-            ? 'humans'
-            : 'monsters';
+            ? ['humans']
+            : ['monsters'];
     }
 
     private readyForNextGame() {

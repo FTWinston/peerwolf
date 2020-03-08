@@ -16,5 +16,5 @@ export interface ServerState {
     playerCards?: Record<string, number>;
     votes?: Record<string, string>;
     killedPlayers?: string[];
-    winners?: Team;
+    winners?: Team[];
 }
