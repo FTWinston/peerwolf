@@ -29,5 +29,5 @@ export type ServerToClientCommand = {
     type: 'result';
     winners: Team[];
     killed: string[];
-    playerCards: Record<string, number>;
+    playerCards: Record<string, string>;
 }

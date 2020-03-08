@@ -28,11 +28,13 @@ const allCards: Card[] = [
         name: 'Robber',
         description: `The robber swaps their card with another player, then looks at their new card.`,
         team: 'humans',
+        limit: 1,
     },
     {
         name: 'Troublemaker',
         description: `The troublemaker swaps two other players' cards, without looking at them.`,
         team: 'humans',
+        limit: 1,
     },
     {
         name: 'Minion',

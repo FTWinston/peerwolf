@@ -13,7 +13,7 @@ export interface ServerState {
     phase: GamePhase;
     setupPlayer: string;
     cards: string[];
-    playerCards?: Record<string, number>;
+    playerCards?: Record<string, string>;
     votes?: Record<string, string>;
     killedPlayers?: string[];
     winners?: Team[];

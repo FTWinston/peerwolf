@@ -164,15 +164,12 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
 
         // Send assign message to each player.
         for (const [_, client] of this.clients) {
-            const cardIndex = playerCards[client.name];
-            if (cardIndex !== undefined) {
-                const cardName = this.state.cards[cardIndex];
-                if (cardName !== undefined) {
-                    this.sendCommand(client, {
-                        type: 'assign',
-                        card: cardName,
-                    });
-                }
+            const cardName = playerCards[client.name];
+            if (cardName !== undefined) {
+                this.sendCommand(client, {
+                    type: 'assign',
+                    card: cardName,
+                });
             }
         }
 
@@ -197,7 +194,7 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
         const indices = this.state.cards.map((_, i) => i);
         shuffle(indices);
 
-        const results: Record<string, number> = {}
+        const results: Record<string, string> = {}
         let nextIndex = 0;
 
         for (const [_, client] of this.clients) {
@@ -205,7 +202,7 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
                 break; // oops?
             }
 
-            results[client.name] = indices[nextIndex++];
+            results[client.name] = this.state.cards[indices[nextIndex++]];
         }
 
         return results;
@@ -261,12 +258,7 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
 
     private determineWinners(killedPlayers: string[]) : Team[] {
         const teamIs = (player: string, team: Team) => {
-            const cardIndex = this.state.playerCards && this.state.playerCards[player];
-            if (cardIndex === undefined) {
-                return false;
-            }
-
-            const cardName = this.state.cards[cardIndex];
+            const cardName = this.state.playerCards && this.state.playerCards[player];
             if (!cardName) {
                 return false;
             }
@@ -278,7 +270,7 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
 
             return card.team === team;
         }
-        
+
         const anyMonsterKilled = killedPlayers.some(player => teamIs(player, 'monsters'));
         const tannerKilled = killedPlayers.some(player => teamIs(player, 'tanner'));
 
