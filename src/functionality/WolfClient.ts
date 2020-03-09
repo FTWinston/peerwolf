@@ -126,6 +126,10 @@ export class WolfClient {
         }
     }
 
+    public sendCommand(command: ClientToServerCommand) {
+        this.connection.sendCommand(command);
+    }
+
     public disconnect() {
         this.connection.disconnect();
     }

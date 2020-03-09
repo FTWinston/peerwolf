@@ -3,6 +3,9 @@ import { WolfClient } from '../functionality/WolfClient';
 import { GamePhase } from '../functionality/ServerState';
 import { Team, Card, cardDetails, errorCard } from '../functionality/Card';
 import { ClientState } from '../functionality/ClientState';
+import './Game.scss';
+import { GameSetup } from './GameSetup';
+import { WaitForSetup } from './WaitForSetup';
 
 interface Props {
     userName: string;
@@ -55,10 +58,28 @@ export const Game: React.FC<Props> = props => {
     }
     else if (state.phase === GamePhase.CardSelection) {
         if (state.setupPlayer === props.userName) {
+            const setCards = (cards: Card[]) => client.sendCommand({
+                type: 'select cards',
+                cards: cards.map(card => card.name),
+            });
             
+            const confirm = () => client.sendCommand({ type: 'ready' });
+
+            return (
+                <GameSetup
+                    cards={state.cards}
+                    setCards={setCards}
+                    confirm={confirm}
+                />
+            );
         }
         else {
-
+            return (
+                <WaitForSetup
+                    cards={state.cards}
+                    setupPlayer={state.setupPlayer}
+                />
+            );
         }
     }
 
