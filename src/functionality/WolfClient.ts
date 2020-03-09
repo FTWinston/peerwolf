@@ -4,32 +4,19 @@ import { LocalConnection, RemoteConnection, Delta, Connection } from 'peer-serve
 import { ClientToServerCommand } from './ClientToServerCommand';
 import { ServerToClientCommand } from './ServerToClientCommand';
 import ServerWorker from './server.worker';
-import { Card, Team, cardDetails, errorCard } from './Card';
-
-export interface ClientEvents {
-    ready: () => void;
-    playersChanged: (players: string[]) => void;
-    setupPlayerChanged: (setupPlayer: string) => void;
-    cardsChanged: (cards: Card[]) => void;
-    phaseChanged: (phase: GamePhase) => void;
-    localPlayerCardChanged: (localPlayerCard?: Card) => void;
-    playerCardsChanged: (playerCards: Record<string, Card>) => void;
-    votesChanged: (votes: Record<string, string>) => void;
-    killedPlayersChanged: (killedPlayers: string[]) => void;
-    winnersChanged: (winners?: Team[]) => void;
-}
 
 export class WolfClient {
     private readonly connection: Connection<ClientToServerCommand, ServerToClientCommand, ClientState>;
 
     constructor(
-        private readonly events: ClientEvents,
-        public readonly name: string,
+        private readonly playersChanged: (players: string[]) => void,
+        private readonly stateChanged: (state: ClientState) => void,
+        private readonly name: string,
         host: string | undefined,
         
     ) {
         const initialState = {
-            phase: GamePhase.CardSelection,
+            phase: GamePhase.Connecting,
             setupPlayer: '',
             cards: [],
         };
@@ -42,10 +29,14 @@ export class WolfClient {
                     clientName: name,
                     receiveCommand: cmd => this.receiveCommand(cmd),
                     receiveError: msg => console.error(msg),
-                    playersChanged: this.events.playersChanged,
-                    stateChanged: (prevState, delta) => this.stateChanged(prevState, delta),
+                    playersChanged: this.playersChanged,
+                    stateChanged: () => this.stateChanged(this.connection.clientState),
                 },
-                this.events.ready
+                () => {
+                    this.connection.updateState({
+                        phase: GamePhase.CardSelection,
+                    });
+                }
             );
         }
         else {
@@ -56,10 +47,14 @@ export class WolfClient {
                     worker: new ServerWorker(),
                     receiveCommand: cmd => this.receiveCommand(cmd),
                     receiveError: msg => console.error(msg),
-                    playersChanged: this.events.playersChanged,
-                    stateChanged: (prevState, delta) => this.stateChanged(prevState, delta),
+                    playersChanged: this.playersChanged,
+                    stateChanged: () => this.stateChanged(this.connection.clientState),
                 },
-                this.events.ready
+                () => {
+                    this.connection.updateState({
+                        phase: GamePhase.CardSelection,
+                    });
+                }
             )
         }
     }
@@ -131,57 +126,7 @@ export class WolfClient {
         }
     }
 
-    public stateChanged(prevState: Readonly<ClientState>, delta: Delta<ClientState>) {
-        const state = this.connection.clientState;
-
-        if (prevState.setupPlayer !== state.setupPlayer) {
-            this.events.setupPlayerChanged(state.setupPlayer);
-        }
-
-        if (prevState.cards !== state.cards) {
-            const cards = state.cards.map(this.getCard);
-            this.events.cardsChanged(cards);
-        }
-
-        if (prevState.phase !== state.phase) {
-            this.events.phaseChanged(state.phase);
-        }
-
-        if (prevState.localPlayerCard !== state.localPlayerCard) {
-            const card = state.localPlayerCard
-                ? this.getCard(state.localPlayerCard)
-                : undefined;
-
-            this.events.localPlayerCardChanged(card);
-        }
-        
-        if (prevState.playerCards !== state.playerCards) {
-            if (state.playerCards === undefined) {
-                this.events.playerCardsChanged({});
-            }
-            else {
-                const playerCards: Record<string, Card> = {};
-                for (const player in state.playerCards) {
-                    playerCards[player] = this.getCard(state.playerCards[player]);
-                }
-                this.events.playerCardsChanged(playerCards);
-            }
-        }
-        
-        if (prevState.votes !== state.votes) {
-            this.events.votesChanged(state.votes ?? {});
-        }
-        
-        if (prevState.killedPlayers !== state.killedPlayers) {
-            this.events.killedPlayersChanged(state.killedPlayers ?? []);
-        }
-        
-        if (prevState.winners !== state.winners) {
-            this.events.winnersChanged(state.winners);
-        }
-    }
-
-    private getCard(card: string) {
-        return cardDetails.get(card) ?? errorCard;
+    public disconnect() {
+        this.connection.disconnect();
     }
 }

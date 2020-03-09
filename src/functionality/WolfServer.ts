@@ -12,7 +12,7 @@ const maxPlayers = 8;
 export class WolfServer extends Server<ServerState, ClientState, ClientToServerCommand, ServerToClientCommand> {
     constructor(sendMessage: (message: ServerWorkerMessageOut<ServerToClientCommand, ClientState>) => void) {
         super({
-            phase: GamePhase.CardSelection,
+            phase: GamePhase.Connecting,
             setupPlayer: '',
             cards: []
         }, sendMessage);
@@ -40,6 +40,7 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
                 });
                 
                 return {
+                    phase: GamePhase.CardSelection,
                     setupPlayer: client.name,
                 };
             }

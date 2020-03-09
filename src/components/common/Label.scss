@@ -1,3 +1,9 @@
+.label {
+    display: flex;
+}
+
 .label__text {
     font-weight: bold;
+    margin-right: 0.5em;
+    min-width: 5.25em;
 }

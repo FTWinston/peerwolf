@@ -1,4 +1,9 @@
 .mainMenu {
     display: flex;
     flex-direction: column;
+    margin: 0 1em;
+}
+
+.mainMenu__row + .mainMenu__row {
+    margin-top: 1em;
 }
