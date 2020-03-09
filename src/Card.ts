@@ -51,4 +51,10 @@ const allCards: Card[] = [
     },
 ];
 
+export const errorCard: Card = {
+    name: 'Error',
+    description: `Something's gone wrong`,
+    team: 'humans',
+};
+
 export const cardDetails: ReadonlyMap<string, Card> = new Map(allCards.map(card => [card.name, card]));

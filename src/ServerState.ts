@@ -1,7 +1,7 @@
 import { Team } from './Card';
 
 export enum GamePhase {
-    CardSelection,
+    CardSelection = 1,
     Readying,
     Countdown,
     Activity,
