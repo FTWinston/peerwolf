@@ -5,11 +5,12 @@ import './Game.scss';
 interface Props {
     cards: Card[];
     players: string[];
-    setupPlayer: string;
+    readyPlayers: string[];
     localPlayer: string;
+    setReady: () => void;
 }
 
-export const WaitForSetup: React.FC<Props> = props => {
+export const Readying: React.FC<Props> = props => {
     return (
         <div className="game game--waitsetup">
             blah

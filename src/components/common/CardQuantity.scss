@@ -1,0 +1,38 @@
+@import '../colors';
+
+.cardQuantity {
+    display: grid;
+    grid-template-columns: 1fr 4em;
+    grid-template-rows: 1fr 4em 4em 4em 1fr;
+    grid-template-areas:
+        "card ."
+        "card increment"
+        "card quantity"
+        "card decrement"
+        "card .";
+}
+
+.cardQuantity__card {
+    grid-area: card;
+}
+
+.cardQuantity__quantity {
+    grid-area: quantity;
+    justify-self: center;
+    align-self: center;
+    font-size: 2em;
+    font-weight: bold;
+    color: $highlightText;
+}
+
+.cardQuantity__button--increment {
+    grid-area: increment;
+}
+
+.cardQuantity__button--decrement {
+    grid-area: decrement;
+}
+
+.cardQuantity--zero .cardQuantity__card {
+    filter:greyscale(80%);
+}

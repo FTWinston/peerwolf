@@ -6,6 +6,11 @@ import { ClientState } from '../functionality/ClientState';
 import './Game.scss';
 import { GameSetup } from './GameSetup';
 import { WaitForSetup } from './WaitForSetup';
+import { Readying } from './Readying';
+import { Countdown } from './Countdown';
+import { Activity } from './Activity';
+import { Discussion } from './Discussion';
+import { Results } from './Results';
 
 interface Props {
     userName: string;
@@ -53,43 +58,91 @@ export const Game: React.FC<Props> = props => {
         }
     }, []);
 
-    if (state.phase === GamePhase.Connecting) {
-        return <div className="game game--connecting">Connecting...</div>
-    }
-    else if (state.phase === GamePhase.CardSelection) {
-        if (state.setupPlayer === props.userName) {
-            const setCards = (cards: Card[]) => client.sendCommand({
-                type: 'select cards',
-                cards: cards.map(card => card.name),
-            });
-            
-            const confirm = () => client.sendCommand({ type: 'ready' });
+    switch (state.phase) {
+        case GamePhase.Connecting:
+            return <div className="game game--connecting">Connecting...</div>
+    
+        case GamePhase.CardSelection:
+            if (state.setupPlayer === props.userName) {
+                const setCards = (cards: Card[]) => client.sendCommand({
+                    type: 'select cards',
+                    cards: cards.map(card => card.name),
+                });
+                
+                const confirm = () => client.sendCommand({ type: 'ready' });
 
-            return (
-                <GameSetup
-                    cards={state.cards}
-                    setCards={setCards}
-                    confirm={confirm}
-                />
-            );
-        }
-        else {
+                return (
+                    <GameSetup
+                        cards={state.cards}
+                        setCards={setCards}
+                        setReady={confirm}
+                    />
+                );
+            }
+            
             return (
                 <WaitForSetup
                     cards={state.cards}
+                    players={state.players}
                     setupPlayer={state.setupPlayer}
+                    localPlayer={props.userName}
                 />
             );
-        }
+
+        case GamePhase.Readying:
+            const ready = () => client.sendCommand({ type: 'ready' });
+
+            return (
+                <Readying
+                    cards={state.cards}
+                    players={state.players}
+                    localPlayer={props.userName}
+                    readyPlayers={Object.keys(state.votes)}
+                    setReady={ready}
+                />
+            )
+        
+        case GamePhase.Countdown:
+            return <Countdown duration={5} />
+
+        case GamePhase.Activity:
+            return (
+                <Activity
+                    duration={30}
+                />
+            );
+
+        case GamePhase.Discussion:
+            const vote = (target: string) => client.sendCommand({
+                type: 'vote',
+                target,
+            });
+
+            return (
+                <Discussion
+                    cards={state.cards}
+                    players={state.players}
+                    localPlayer={props.userName}
+                    votes={state.votes}
+                    vote={vote}
+                />
+            );
+
+        case GamePhase.Results:
+            return (
+                <Results
+                    cards={state.cards}
+                    players={state.players}
+                    localPlayer={props.userName}
+                    playerCards={state.playerCards}
+                    votes={state.votes}
+                    killedPlayers={state.killedPlayers}
+                    winners={state.winners ?? []}
+                />
+            )
+        default:
+            throw new Error(`Invalid game phase: ${state.phase}`);
     }
-
-    return (
-        <div className="game">
-            <p>User name is {props.userName}</p>
-
-            <p>Remote ID is {props.remoteId}</p>
-        </div>
-    )
 }
 
 function updateState(clientState: ClientState, players: string[]): GameState {
