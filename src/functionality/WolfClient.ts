@@ -1,9 +1,6 @@
 import { ClientState } from './ClientState';
 import { GamePhase } from './ServerState';
-import { LocalConnection } from 'peer-server/lib/LocalConnection';
-import { RemoteConnection } from 'peer-server/lib/RemoteConnection';
-import { Delta } from 'peer-server/lib/Delta';
-import { Connection } from 'peer-server/lib/Connection';
+import { LocalConnection, RemoteConnection, Connection, Delta } from 'peer-server';
 import { ClientToServerCommand } from './ClientToServerCommand';
 import { ServerToClientCommand } from './ServerToClientCommand';
 import ServerWorker from 'worker-loader!./server.worker'; // eslint-disable-line import/no-webpack-loader-syntax
