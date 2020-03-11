@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card } from '../functionality/Card';
+import { Card, cardDetails } from '../functionality/Card';
 import { CardQuantity } from './common/CardQuantity';
 import './Game.scss';
 
@@ -16,6 +16,7 @@ export const GameSetup: React.FC<Props> = props => {
     for (const [card, quantity] of cards) {
         cardQuantities.push(
             <CardQuantity
+                key={card.name}
                 card={card}
                 quantity={quantity}
                 setQuantity={newAmount => props.setCards(adjustAmount(cards, card, newAmount))}
@@ -25,13 +26,17 @@ export const GameSetup: React.FC<Props> = props => {
 
     return (
         <div className="game game--setup">
-            blah
+            {cardQuantities}
         </div>
     )
 }
 
 function arrayToMap(cards: Card[]): Map<Card, number> {
     const results = new Map<Card, number>();
+
+    for (const [_, card] of cardDetails) {
+        results.set(card, 0);
+    }
 
     for (const card of cards) {
         const existing = results.get(card);

@@ -23,7 +23,7 @@ export const CardQuantity: React.FC<Props> = props => {
             <CardDisplay card={props.card} className="cardQuantity__card" />
             <Button
                 className="cardQuantity__button cardQuantity__button--increment"
-                disabled={props.quantity <= 0}
+                disabled={props.card.limit !== undefined && props.quantity >= props.card.limit}
                 onClick={increment}
                 text="+"
             />
@@ -32,7 +32,7 @@ export const CardQuantity: React.FC<Props> = props => {
 
             <Button
                 className="cardQuantity__button cardQuantity__button--decrement"
-                disabled={props.card.limit !== undefined && props.quantity >= props.card.limit}
+                disabled={props.quantity <= 0}
                 onClick={decrement}
                 text="-"
             />

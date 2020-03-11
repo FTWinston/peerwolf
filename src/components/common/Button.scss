@@ -2,6 +2,9 @@
 
 .button {
     background-color: $fillBg;
+    border: solid $faintText 1px;
+    text-align: center;
+    vertical-align: center;
     color: $brightText;
     font-size: 2em;
     font-weight: bold;

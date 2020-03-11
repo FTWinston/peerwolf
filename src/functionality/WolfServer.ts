@@ -42,26 +42,20 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
                 setupPlayer: client.name,
             };
         }
-        else if (this.state.phase === GamePhase.CardSelection) {
-            // tell the new player who's setting up.
-            this.sendCommand(client, {
-                type: 'setup',
-                player: this.state.setupPlayer,
-            });
+        
+        // Tell the new player who's setting up, and what cards are in play.
+        this.sendCommand(client, {
+            type: 'setup',
+            player: this.state.setupPlayer,
+        });
 
-            this.sendCommand(client, {
-                type: 'chosen cards',
-                cards: this.state.cards,
-            });
-        }
+        this.sendCommand(client, {
+            type: 'chosen cards',
+            cards: this.state.cards,
+        });
 
         // If readying, someone joining upsets the chosen number of cards, so need to step back.
-        else if (this.state.phase === GamePhase.Readying) {
-            this.sendCommand(undefined, {
-                type: 'setup',
-                player: this.state.setupPlayer,
-            });
-
+        if (this.state.phase === GamePhase.Readying) {
             return {
                 phase: GamePhase.CardSelection,
                 votes: undefined,
@@ -94,6 +88,11 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
                 return;
             }
         }
+
+        this.sendCommand(undefined, {
+            type: 'chosen cards',
+            cards,
+        });
 
         return {
             cards
