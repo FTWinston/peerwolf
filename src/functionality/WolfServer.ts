@@ -1,5 +1,4 @@
-import { Server, ClientInfo, Delta } from 'peer-server';
-import { ServerWorkerMessageOut } from 'peer-server/ServerWorkerMessageOut';
+import { Server, ClientInfo, Delta, ServerWorkerMessageOut } from 'peer-server';
 import { ServerState, GamePhase } from './ServerState';
 import { ClientState } from './ClientState';
 import { ClientToServerCommand } from './ClientToServerCommand';

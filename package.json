@@ -11,7 +11,7 @@
     "@types/react": "^16.9.23",
     "@types/react-dom": "^16.9.5",
     "bootstrap": "^4.4.1",
-    "peer-server": "../peer-server-test/src/framework",
+    "peer-server": "git+https://github.com/FTWinston/peer-server.git",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-scripts": "3.4.0",
