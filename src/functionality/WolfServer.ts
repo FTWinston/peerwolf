@@ -31,32 +31,28 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
     }
 
     clientJoined(client: ClientInfo): Delta<ServerState> | undefined {
-        if (this.state.phase === GamePhase.CardSelection) {
-            // if no setup player already, this first player must be the setup player.
-            if (this.state.setupPlayer === '') {
-                this.sendCommand(client, {
-                    type: 'setup',
-                    player: client.name,
-                });
-                
-                return {
-                    phase: GamePhase.CardSelection,
-                    setupPlayer: client.name,
-                };
-            }
+        if (this.state.phase === GamePhase.Connecting) {
+            this.sendCommand(client, {
+                type: 'setup',
+                player: client.name,
+            });
+            
+            return {
+                phase: GamePhase.CardSelection,
+                setupPlayer: client.name,
+            };
+        }
+        else if (this.state.phase === GamePhase.CardSelection) {
+            // tell the new player who's setting up.
+            this.sendCommand(client, {
+                type: 'setup',
+                player: this.state.setupPlayer,
+            });
 
-            // Otherwise, tell the new player who's setting up.
-            else {        
-                this.sendCommand(client, {
-                    type: 'setup',
-                    player: this.state.setupPlayer,
-                });
-
-                this.sendCommand(client, {
-                    type: 'chosen cards',
-                    cards: this.state.cards,
-                });
-            }
+            this.sendCommand(client, {
+                type: 'chosen cards',
+                cards: this.state.cards,
+            });
         }
 
         // If readying, someone joining upsets the chosen number of cards, so need to step back.
