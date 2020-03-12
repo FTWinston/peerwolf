@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, cardDetails } from '../functionality/Card';
 import { CardQuantity } from './common/CardQuantity';
-import './Game.scss';
+import './GameSetup.scss';
+import { PlayerList, PlayerStatus } from './common/PlayerList';
+import { numExtraCards } from '../functionality/ServerState';
+import { Button } from './common/Button';
 
 interface Props {
+    players: string[];
+    localPlayer: string;
     cards: Card[];
     setCards: (cards: Card[]) => void;
     setReady: () => void;
@@ -24,9 +29,62 @@ export const GameSetup: React.FC<Props> = props => {
         );
     }
 
+    const players = useMemo(
+        () => {
+            return props.players.reduce(
+                (a, b) => { a[b] = PlayerStatus.None; return a; },
+                {} as Record<string, PlayerStatus>
+            );
+        },
+        [props.players]
+    )
+
+    const targetNumCards = props.players.length + numExtraCards;
+
+    const quantities = props.cards.length < targetNumCards
+        ? (
+            <div className="gameSetup__quantities">
+                <p>You have {props.players.length} players, so need <span className="gameSetup__quantity gameSetup__quantity--invalid">{targetNumCards}</span> cards.</p>
+                <p>Select <span className="gameSetup__quantity">{targetNumCards - props.cards.length} more</span> cards.</p>
+            </div>
+        )
+        : props.cards.length > targetNumCards
+            ? (
+                <div className="gameSetup__quantities">
+                    <p>You have {props.players.length} players, so need <span className="gameSetup__quantity gameSetup__quantity--invalid">{targetNumCards}</span> cards.</p>
+                    <p>Select <span className="gameSetup__quantity">{props.cards.length - targetNumCards} fewer</span> cards.</p>
+                </div>
+            )
+            : (
+                <div className="gameSetup__quantities">
+                    <p>You have {props.players.length} players, so need <span className="gameSetup__quantity gameSetup__quantity--valid">{targetNumCards}</span> cards.</p>
+                </div>
+            );
+
+
     return (
-        <div className="game game--setup">
-            {cardQuantities}
+        <div className="gameSetup">
+            <h2 className="gameSetup__heading">Game setup</h2>
+
+            <div className="gameSetup__quantities">
+                {cardQuantities}
+            </div>
+
+            <PlayerList
+                className="gameSetup__players"
+                players={players}
+                localPlayer={props.localPlayer}
+            />
+
+            {quantities}
+
+            <div className="gameSetup__actions">
+                <Button
+                    disabled={props.cards.length !== targetNumCards}
+                    text="Ready"
+                    onClick={props.setReady}
+                />
+            </div>
         </div>
     )
 }
@@ -50,7 +108,7 @@ function mapToArray(cards: Map<Card, number>): Card[] {
     const results: Card[] = [];
 
     for (const [card, quantity] of cards) {
-        for (let i=0; i<quantity; i++) {
+        for (let i = 0; i < quantity; i++) {
             results.push(card);
         }
     }

@@ -1,0 +1,9 @@
+.gameSetup {
+    display: flex;
+    flex-direction: column;
+}
+
+.gameSetup__quantities {
+    display: flex;
+    flex-wrap: wrap;
+}

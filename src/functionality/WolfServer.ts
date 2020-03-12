@@ -1,6 +1,6 @@
 import { Server } from 'peer-server/lib/Server';
 import { ClientInfo, Delta, ServerWorkerMessageOut } from 'peer-server';
-import { ServerState, GamePhase } from './ServerState';
+import { ServerState, GamePhase, numExtraCards } from './ServerState';
 import { ClientState } from './ClientState';
 import { ClientToServerCommand } from './ClientToServerCommand';
 import { ServerToClientCommand } from './ServerToClientCommand';
@@ -125,6 +125,10 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
             };
         }
         else if (this.state.phase === GamePhase.CardSelection && client.name === this.state.setupPlayer) {
+            if (this.state.cards.length !== this.clients.size + numExtraCards) {
+                return;
+            }
+
             // In card selection, the setup player indicates they are done selecting by sending ready.
             // So send (and mark) this player as ready, and advance to the readying phase.
             this.sendCommand(undefined, {

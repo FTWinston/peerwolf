@@ -3,7 +3,6 @@ import { WolfClient } from '../functionality/WolfClient';
 import { GamePhase } from '../functionality/ServerState';
 import { Team, Card, cardDetails, errorCard } from '../functionality/Card';
 import { ClientState } from '../functionality/ClientState';
-import './Game.scss';
 import { GameSetup } from './GameSetup';
 import { WaitForSetup } from './WaitForSetup';
 import { Readying } from './Readying';
@@ -11,6 +10,7 @@ import { Countdown } from './Countdown';
 import { Activity } from './Activity';
 import { Discussion } from './Discussion';
 import { Results } from './Results';
+import { Message } from './Message';
 
 interface Props {
     userName: string;
@@ -60,7 +60,7 @@ export const Game: React.FC<Props> = props => {
 
     switch (state.phase) {
         case GamePhase.Connecting:
-            return <div className="game game--connecting">Connecting...</div>
+            return <Message>Connecting...</Message>
     
         case GamePhase.CardSelection:
             if (state.setupPlayer === props.userName) {
@@ -73,6 +73,8 @@ export const Game: React.FC<Props> = props => {
 
                 return (
                     <GameSetup
+                        players={state.players}
+                        localPlayer={props.userName}
                         cards={state.cards}
                         setCards={setCards}
                         setReady={confirm}
@@ -82,10 +84,10 @@ export const Game: React.FC<Props> = props => {
             
             return (
                 <WaitForSetup
-                    cards={state.cards}
                     players={state.players}
-                    setupPlayer={state.setupPlayer}
                     localPlayer={props.userName}
+                    setupPlayer={state.setupPlayer}
+                    cards={state.cards}
                 />
             );
 
@@ -94,11 +96,11 @@ export const Game: React.FC<Props> = props => {
 
             return (
                 <Readying
-                    cards={state.cards}
                     players={state.players}
                     localPlayer={props.userName}
                     readyPlayers={Object.keys(state.votes)}
                     setReady={ready}
+                    cards={state.cards}
                 />
             )
         
@@ -120,9 +122,9 @@ export const Game: React.FC<Props> = props => {
 
             return (
                 <Discussion
-                    cards={state.cards}
                     players={state.players}
                     localPlayer={props.userName}
+                    cards={state.cards}
                     votes={state.votes}
                     vote={vote}
                 />
@@ -131,13 +133,13 @@ export const Game: React.FC<Props> = props => {
         case GamePhase.Results:
             return (
                 <Results
-                    cards={state.cards}
                     players={state.players}
                     localPlayer={props.userName}
-                    playerCards={state.playerCards}
-                    votes={state.votes}
                     killedPlayers={state.killedPlayers}
+                    votes={state.votes}
                     winners={state.winners ?? []}
+                    cards={state.cards}
+                    playerCards={state.playerCards}
                 />
             )
         default:

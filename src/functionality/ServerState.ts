@@ -10,6 +10,8 @@ export enum GamePhase {
     Results,
 }
 
+export const numExtraCards = 3;
+
 export interface ServerState {
     phase: GamePhase;
     setupPlayer: string;
