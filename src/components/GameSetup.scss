@@ -1,9 +1,10 @@
 .gameSetup {
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
-.gameSetup__quantities {
+.gameSetup__cards {
     display: flex;
     flex-wrap: wrap;
 }

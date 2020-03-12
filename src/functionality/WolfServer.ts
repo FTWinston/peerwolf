@@ -1,13 +1,11 @@
 import { Server } from 'peer-server/lib/Server';
 import { ClientInfo, Delta, ServerWorkerMessageOut } from 'peer-server';
-import { ServerState, GamePhase, numExtraCards } from './ServerState';
+import { ServerState, GamePhase, numExtraCards, maxPlayers, minPlayers } from './ServerState';
 import { ClientState } from './ClientState';
 import { ClientToServerCommand } from './ClientToServerCommand';
 import { ServerToClientCommand } from './ServerToClientCommand';
 import { cardDetails, Team } from './Card';
 import { shuffle } from './Random';
-
-const maxPlayers = 8;
 
 export class WolfServer extends Server<ServerState, ClientState, ClientToServerCommand, ServerToClientCommand> {
     constructor(sendMessage: (message: ServerWorkerMessageOut<ServerToClientCommand, ClientState>) => void) {
@@ -125,7 +123,7 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
             };
         }
         else if (this.state.phase === GamePhase.CardSelection && client.name === this.state.setupPlayer) {
-            if (this.state.cards.length !== this.clients.size + numExtraCards) {
+            if (this.clients.size < minPlayers || this.state.cards.length !== this.clients.size + numExtraCards) {
                 return;
             }
 

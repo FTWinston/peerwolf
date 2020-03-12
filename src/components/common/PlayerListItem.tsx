@@ -14,8 +14,8 @@ export const PlayerListItem: React.FC<Props> = props => {
     }
 
     return (
-        <div className={classes}>
+        <span className={classes}>
             {props.player}
-        </div>
+        </span>
     );
 }

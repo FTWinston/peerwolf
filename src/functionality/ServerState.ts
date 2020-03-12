@@ -12,6 +12,9 @@ export enum GamePhase {
 
 export const numExtraCards = 3;
 
+export const minPlayers = 3;
+export const maxPlayers = 8;
+
 export interface ServerState {
     phase: GamePhase;
     setupPlayer: string;

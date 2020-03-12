@@ -1,3 +1,24 @@
-.playerList {
-    
+.playerList__item {
+    display: inline-block;
+    font-weight: bold;
+}
+
+.playerList__item + .playerList__item::before {
+    content: ', ';
+}
+
+.playerList__item--local {
+    text-decoration: underline;
+}
+
+.playerList__item--stateReady::after {
+    content: '✓';
+    color: green;
+    margin-left: 0.25em;
+}
+
+.playerList__item--stateNotReady::after {
+    content: '✗';
+    color: darkred;
+    margin-left: 0.25em;
 }

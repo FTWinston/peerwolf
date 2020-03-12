@@ -10,7 +10,7 @@ import { Countdown } from './Countdown';
 import { Activity } from './Activity';
 import { Discussion } from './Discussion';
 import { Results } from './Results';
-import { Message } from './Message';
+import { Message } from './common/Message';
 
 interface Props {
     userName: string;
@@ -44,8 +44,8 @@ export const Game: React.FC<Props> = props => {
     const [client] = useState<WolfClient>(() => {
         const remoteId = props.remoteId.trim() ? props.remoteId.trim() : undefined;
         return new WolfClient(
-            players => setState({ ...state, players}),
-            clientState => setState(updateState(clientState, state.players)),
+            players => setState(state => ({ ...state, players})),
+            clientState => setState(state => updateState(clientState, state.players)),
             props.userName,
             remoteId
         );
@@ -98,6 +98,7 @@ export const Game: React.FC<Props> = props => {
                 <Readying
                     players={state.players}
                     localPlayer={props.userName}
+                    setupPlayer={state.setupPlayer}
                     readyPlayers={Object.keys(state.votes)}
                     setReady={ready}
                     cards={state.cards}

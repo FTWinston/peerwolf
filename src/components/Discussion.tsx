@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../functionality/Card';
-import './Game.scss';
 
 interface Props {
     cards: Card[];
