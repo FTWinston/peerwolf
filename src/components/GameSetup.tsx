@@ -9,6 +9,7 @@ import { Button } from './common/Button';
 interface Props {
     players: string[];
     localPlayer: string;
+    serverId: string;
     cards: Card[];
     setCards: (cards: Card[]) => void;
     setReady: () => void;
@@ -71,6 +72,10 @@ export const GameSetup: React.FC<Props> = props => {
     return (
         <div className="gameSetup">
             <h2 className="gameSetup__heading">Game setup</h2>
+            
+            <div className="gameSetup__connection">
+                Players should connect to: {props.serverId}
+            </div>
 
             <div className="gameSetup__cards">
                 {cardQuantities}

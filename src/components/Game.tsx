@@ -76,6 +76,7 @@ export const Game: React.FC<Props> = props => {
                         players={state.players}
                         localPlayer={props.userName}
                         cards={state.cards}
+                        serverId={client.localId}
                         setCards={setCards}
                         setReady={confirm}
                     />
@@ -87,6 +88,7 @@ export const Game: React.FC<Props> = props => {
                     players={state.players}
                     localPlayer={props.userName}
                     setupPlayer={state.setupPlayer}
+                    serverId={client.remoteId}
                     cards={state.cards}
                 />
             );

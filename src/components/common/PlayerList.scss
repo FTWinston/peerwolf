@@ -3,12 +3,16 @@
     font-weight: bold;
 }
 
-.playerList__item + .playerList__item::before {
-    content: ', ';
-}
-
 .playerList__item--local {
     text-decoration: underline;
+}
+
+.playerList__item + .playerList__item::before {
+    content: ', ';
+    display:inline-block;
+    padding-right: 0.5em;
+    font-weight: normal;
+    text-decoration: none;
 }
 
 .playerList__item--stateReady::after {

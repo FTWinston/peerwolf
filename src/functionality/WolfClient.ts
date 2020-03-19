@@ -130,6 +130,10 @@ export class WolfClient {
         this.connection.sendCommand(command);
     }
 
+    public get localId() { return this.connection.localId; }
+
+    public get remoteId() { return (this.connection as RemoteConnection<ClientToServerCommand, ServerToClientCommand, ClientState>).remoteId; }
+
     public disconnect() {
         this.connection.disconnect();
     }

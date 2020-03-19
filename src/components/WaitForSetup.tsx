@@ -6,6 +6,7 @@ import { PlayerList, PlayerStatus } from './common/PlayerList';
 interface Props {
     cards: Card[];
     players: string[];
+    serverId: string;
     setupPlayer: string;
     localPlayer: string;
 }
@@ -24,6 +25,10 @@ export const WaitForSetup: React.FC<Props> = props => {
     return (
         <div className="gameSetup">
             <h2 className="gameSetup__heading">Game setup</h2>
+
+            <div className="gameSetup__connection">
+                Players should connect to: {props.serverId}
+            </div>
 
             <div className="gameSetup__cards">
                 {props.cards.map((card, index) => <CardDisplay key={index} card={card} />)}
