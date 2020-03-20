@@ -69,7 +69,7 @@ export const Game: React.FC<Props> = props => {
                     cards: cards.map(card => card.name),
                 });
                 
-                const confirm = () => client.sendCommand({ type: 'ready' });
+                const confirm = () => client.sendCommand({ type: 'ready', ready: true });
 
                 return (
                     <GameSetup
@@ -94,7 +94,10 @@ export const Game: React.FC<Props> = props => {
             );
 
         case GamePhase.Readying:
-            const ready = () => client.sendCommand({ type: 'ready' });
+            const ready = () => client.sendCommand({
+                type: 'ready',
+                ready: props.userName !== state.setupPlayer
+            });
 
             return (
                 <Readying

@@ -10,7 +10,7 @@ export type ServerToClientCommand = {
     type: 'get ready';
 } | {
     type: 'ready';
-    player: string;
+    players: string[];
 } | {
     type: 'assign';
     card: string;

@@ -1,5 +1,6 @@
 export type ClientToServerCommand = {
     type: 'ready';    
+    ready: boolean;
 } | {
     type: 'select cards';
     cards: string[];

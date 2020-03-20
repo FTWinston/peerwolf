@@ -83,10 +83,14 @@ export class WolfClient {
                 }
                 
             case 'ready':
+                const votes: Record<string, string> = {};
+
+                for (const player of command.players) {
+                    votes[player] = '';
+                }
+
                 return {
-                    votes: {
-                        [command.player]: ''
-                    }
+                    votes
                 }
                 
             case 'assign':

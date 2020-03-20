@@ -24,6 +24,25 @@ export const Readying: React.FC<Props> = props => {
         [props.players]
     )
 
+    const quantityMsg = props.setupPlayer === props.localPlayer
+        ? `You have chosen the above cards. Waiting for all players to say they're ready to start, or click below to change the cards.`
+        : `${props.setupPlayer} has chosen the above cards. Wait for all players to say they're ready to start.`;
+
+    const actionButton = props.setupPlayer === props.localPlayer
+        ? (
+            <Button
+                text="Go back"
+                onClick={props.setReady}
+            />
+        )
+        : (
+            <Button
+                disabled={props.readyPlayers.indexOf(props.localPlayer) !== -1}
+                text="Ready"
+                onClick={props.setReady}
+            />
+        )
+
     return (
         <div className="gameSetup">
             <h2 className="gameSetup__heading">Ready to start?</h2>
@@ -32,9 +51,7 @@ export const Readying: React.FC<Props> = props => {
                 {props.cards.map((card, index) => <CardDisplay key={index} card={card} />)}
             </div>
 
-            <div className="gameSetup__quantities">
-                {props.setupPlayer} has chosen the above cards. Waiting for all players to say they're ready to start.
-            </div>
+            <div className="gameSetup__quantities">{quantityMsg}</div>
 
 
             <PlayerList
@@ -44,11 +61,7 @@ export const Readying: React.FC<Props> = props => {
                 showPrefix={true}
             />
             <div className="gameSetup__actions">
-                <Button
-                    disabled={props.readyPlayers.indexOf(props.localPlayer) !== -1}
-                    text="Ready"
-                    onClick={props.setReady}
-                />
+                {actionButton}
             </div>
         </div>
     );

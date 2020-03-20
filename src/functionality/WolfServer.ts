@@ -6,6 +6,7 @@ import { ClientToServerCommand } from './ClientToServerCommand';
 import { ServerToClientCommand } from './ServerToClientCommand';
 import { cardDetails, Team } from './Card';
 import { shuffle } from './Random';
+import { timingSafeEqual } from 'crypto';
 
 export class WolfServer extends Server<ServerState, ClientState, ClientToServerCommand, ServerToClientCommand> {
     constructor(sendMessage: (message: ServerWorkerMessageOut<ServerToClientCommand, ClientState>) => void) {
@@ -66,7 +67,7 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
             case 'select cards':
                 return this.receiveCardSelection(client, command.cards);
             case 'ready':
-                return this.receiveReady(client);
+                return this.receiveReady(client, command.ready);
             case 'pick card':
             case 'pick player':
             case 'pick players': // TODO: resolve these depending on the player's allocated card
@@ -97,30 +98,62 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
         };
     }
 
-    private receiveReady(client: ClientInfo): Delta<ServerState> | undefined {
+    private receiveReady(client: ClientInfo, isReady: boolean): Delta<ServerState> | undefined {
         if (this.state.phase === GamePhase.Readying) {
-            // When readying, tell everyone that this player as ready.
-            this.sendCommand(undefined, {
-                type: 'ready',
-                player: client.name,
-            });
+            if (isReady) {
+                // When readying, tell everyone that this player is ready.
+                this.sendCommand(undefined, {
+                    type: 'ready',
+                    players: this.state.votes
+                        ? [
+                            ...Object.keys(this.state.votes),
+                            client.name,
+                        ]
+                        : [ client.name ],
+                });
 
-            // If all players are now ready, start the game and clear the "ready" votes.
-            if (this.state.votes && Object.keys(this.state.votes).length >= this.clients.size - 1) {
-                setTimeout(() => this.startGame(), 3000);
+                // If all players are now ready, start the game and clear the "ready" votes.
+                if (this.state.votes && Object.keys(this.state.votes).length >= this.clients.size - 1) {
+                    setTimeout(() => this.startGame(), 3000);
 
+                    return {
+                        phase: GamePhase.Countdown,
+                        votes: undefined,
+                    }
+                }
+
+                // Otherwise, just record this player's readiness.
                 return {
-                    phase: GamePhase.Countdown,
-                    votes: undefined,
+                    votes: {
+                        [client.name]: ''
+                    }
+                };
+            }
+            else {
+                if (client.name === this.state.setupPlayer) {
+                    // Step back to card selection phase if the setup player is no longer ready.
+                    return {
+                        phase: GamePhase.CardSelection,
+                        votes: undefined,
+                    }
+                }
+                else {
+                    // Remove this player's readiness, and tell everyone.
+                    const newVotes = this.state.votes
+                        ? { ...this.state.votes }
+                        : {};
+                    delete newVotes[client.name];
+
+                    this.sendCommand(undefined, {
+                        type: 'ready',
+                        players: Object.keys(newVotes),
+                    });
+
+                    return {
+                        votes: newVotes,
+                    };
                 }
             }
-
-            // Otherwise, just record this player's vote.
-            return {
-                votes: {
-                    [client.name]: ''
-                }
-            };
         }
         else if (this.state.phase === GamePhase.CardSelection && client.name === this.state.setupPlayer) {
             if (this.clients.size < minPlayers || this.state.cards.length !== this.clients.size + numExtraCards) {
@@ -135,7 +168,7 @@ export class WolfServer extends Server<ServerState, ClientState, ClientToServerC
             
             this.sendCommand(undefined, {
                 type: 'ready',
-                player: client.name,
+                players: [ client.name ],
             });
 
             return {
